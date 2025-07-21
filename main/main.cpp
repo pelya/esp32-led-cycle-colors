@@ -161,5 +161,7 @@ void app_main(void)
   /* Set all LED off to clear all pixels */
   led_strip_clear(rgb_led);
 
+  gpio_set_pull_mode((gpio_num_t)CONFIG_BOOT_BTN_GPIO, GPIO_FLOATING);
+
   esp_deep_sleep_start();
 }
