@@ -113,7 +113,9 @@ void app_main(void)
   const float COLOR_SHIFT_MAX_STEP = 15.0f;
 
   for (int counter = 0; counter < SHUT_OFF_TIME; counter++) {
-    vTaskDelay(pdMS_TO_TICKS(LOOP_DELAY_MS));
+    //vTaskDelay(pdMS_TO_TICKS(LOOP_DELAY_MS));
+    esp_sleep_enable_timer_wakeup(LOOP_DELAY_MS * 1000);
+    esp_light_sleep_start();
 
     if (counter > 500 / LOOP_DELAY_MS && gpio_get_level((gpio_num_t)CONFIG_BOOT_BTN_GPIO) == 0) {
       // BOOT button pressed, power off early
@@ -146,7 +148,7 @@ void app_main(void)
     }
     prev.b += diff;
 
-    ESP_LOGI(TAG, "%3d %3d %3d", (int)nearbyintf(prev.r), (int)nearbyintf(prev.g), (int)nearbyintf(prev.b));
+    //ESP_LOGI(TAG, "%3d %3d %3d", (int)nearbyintf(prev.r), (int)nearbyintf(prev.g), (int)nearbyintf(prev.b));
     /* Set the LED pixel using RGB from 0 (0%) to 255 (100%) for each color, 2 is almost invisible, 4 is dim */
     led_strip_set_pixel(rgb_led, 0,
       std::max(0, std::min(255, (int)nearbyintf(prev.r))),
@@ -163,5 +165,6 @@ void app_main(void)
 
   gpio_set_pull_mode((gpio_num_t)CONFIG_BOOT_BTN_GPIO, GPIO_FLOATING);
 
+  esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
   esp_deep_sleep_start();
 }
